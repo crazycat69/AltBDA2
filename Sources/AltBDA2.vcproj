@@ -30,8 +30,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description="SVN revision refresh"
-				CommandLine="$(ProjectDir)\preBuild.cmd"
+				Description=""
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -121,8 +121,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				Description="SVN revision refresh"
-				CommandLine="$(ProjectDir)\preBuild.cmd"
+				Description=""
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -369,27 +369,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\STAPI\stddefs.h"
-				>
-			</File>
-			<File
-				RelativePath=".\svnrev_template.h"
-				>
-			</File>
-			<File
-				RelativePath=".\svnrev_unknown.h"
-				>
-			</File>
-			<File
 				RelativePath=".\tbsbda.h"
 				>
 			</File>
 			<File
 				RelativePath=".\THIOCtrl.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ttBdaInternal.h"
 				>
 			</File>
 			<File
@@ -408,14 +392,6 @@
 			</File>
 			<File
 				RelativePath=".\res\Version.rc2"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Scripts"
-			>
-			<File
-				RelativePath=".\preBuild.cmd"
 				>
 			</File>
 		</Filter>
