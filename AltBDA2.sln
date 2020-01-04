@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AltBDA2", "Sources\AltBDA2.vcproj", "{02979006-EDEE-41A7-9C9A-CA0AE592CFFD}"
+EndProject
+Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{02979006-EDEE-41A7-9C9A-CA0AE592CFFD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{02979006-EDEE-41A7-9C9A-CA0AE592CFFD}.Debug|Win32.Build.0 = Debug|Win32
+		{02979006-EDEE-41A7-9C9A-CA0AE592CFFD}.Release|Win32.ActiveCfg = Release|Win32
+		{02979006-EDEE-41A7-9C9A-CA0AE592CFFD}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

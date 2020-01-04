@@ -1,0 +1,38 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,SVN_REV
+ PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,SVN_REV
+ FILEFLAGSMASK 0x1fL
+#ifdef _DEBUG
+ FILEFLAGS 0xbL
+#else
+ FILEFLAGS 0xaL
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "ProductName", "BDA DVB-S/T/C Driver Wrapper for AltDVB"
+            VALUE "ProductVersion", VERSION_STRING
+            VALUE "LegalCopyright", "(C) 2008 Diodato, 2010-18 CrazyCat"
+            VALUE "CompanyName", "CrazyCat Labs"
+            VALUE "FileDescription", "BDA DVB-S/T/C Driver Wrapper for AltDVB"
+            VALUE "FileVersion", VERSION_STRING
+            VALUE "OriginalFilename", "Dev_Bda2Driver.int"
+            VALUE "InternalName", "Dev_Bda2Driver.int"
+            VALUE "PrivateBuild", SVN_MODS
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
