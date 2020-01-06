@@ -81,44 +81,6 @@ BOOL ConfDialog::OnInitDialog()
 
 	m_strBDAExt.Append(" used");
 
-	switch(m_ConfParams.S2Pilot)
-	{
-		case PILOT_OFF:
-			m_iPilot=1;
-			break;
-		case PILOT_ON:
-			m_iPilot=2;
-			break;
-		case PILOT_NOT_SET:
-		default:
-			m_iPilot=0;
-	}
-
-	switch(m_ConfParams.S2RollOff)
-	{
-	case ROLLOFF_20:
-		m_iRollOff=1;
-		break;
-	case ROLLOFF_25:
-		m_iRollOff=2;
-		break;
-	case ROLLOFF_35:
-		m_iRollOff=3;
-		break;
-	case ROLLOFF_NOT_SET:
-	default:
-		m_iRollOff=0;
-	}
-
-	m_ctrlMIS.InsertString(0,"OFF");
-	for (int i=0; i<256; i++)
-	{
-		CString str;
-		str.Format("%i",i);
-		m_ctrlMIS.InsertString(i+1,str);
-	}
-	m_ctrlMIS.SetCurSel(m_ConfParams.MIS+1);
-
 	m_ctrlRelockTime.InsertString(0,"OFF");
 	for (int i=1; i<=MAX_TIMEOUT; i++)
 	{
@@ -137,9 +99,6 @@ void ConfDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_STATIC_BDAEXT, m_strBDAExt);
-	DDX_CBIndex(pDX, IDC_COMBO_ROLLOFF, m_iRollOff);
-	DDX_CBIndex(pDX, IDC_COMBO_PILOT, m_iPilot);
-	DDX_Control(pDX, IDC_COMBO_MIS, m_ctrlMIS);
 	DDX_Control(pDX, IDC_COMBO_RELOCKTIME, m_ctrlRelockTime);
 }
 
@@ -160,32 +119,6 @@ void ConfDialog::OnClose()
 void ConfDialog::OnBnClickedOk()
 {
 	UpdateData();
-	switch(m_iPilot)
-	{
-	case 1:
-		m_ConfParams.S2Pilot=PILOT_OFF;
-		break;
-	case 2:
-		m_ConfParams.S2Pilot=PILOT_ON;
-		break;
-	default:
-		m_ConfParams.S2Pilot=PILOT_NOT_SET;
-	}
-	switch(m_iRollOff)
-	{
-	case 1:
-		m_ConfParams.S2RollOff = ROLLOFF_20;
-		break;
-	case 2:
-		m_ConfParams.S2RollOff = ROLLOFF_25;
-		break;
-	case 3:
-		m_ConfParams.S2RollOff = ROLLOFF_35;
-		break;
-	default:
-		m_ConfParams.S2RollOff = ROLLOFF_NOT_SET;
-	}
-	m_ConfParams.MIS = m_ctrlMIS.GetCurSel()-1;
 	m_ConfParams.RelockTimeout = m_ctrlRelockTime.GetCurSel();
 
 	*m_pConfParams = m_ConfParams; 

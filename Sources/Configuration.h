@@ -31,17 +31,6 @@ enum VENDOR_SPECIFIC { PURE_BDA,
 					   NETUP_BDA,
 					   CRAZY_BDA};
 
-enum S2_ROLLOFF { ROLLOFF_NOT_SET = -1,
-				  ROLLOFF_NOT_DEFINED = 0,
-				  ROLLOFF_20 = 1,
-				  ROLLOFF_25,
-				  ROLLOFF_35 };
-
-enum S2_PILOT { PILOT_NOT_SET = -1,
-				PILOT_NOT_DEFINED = 0,
-				PILOT_OFF,
-				PILOT_ON };
-
 enum LEVELS_TYPE { LEVELS_BDA, LEVELS_TT, LEVELS_STB };
 
 #define MAX_TIMEOUT 10
@@ -52,10 +41,7 @@ typedef struct CONF_PARAMS
 	int ConfDiSEqC; 
 	ModulationType ConfMod8PSK;
 	int VendorSpecific;
-	int S2RollOff;
-	int S2Pilot;
 	clock_t RelockTimeout;
-	int MIS;
 } CONF_PARAMS;
 
 class CConfiguration

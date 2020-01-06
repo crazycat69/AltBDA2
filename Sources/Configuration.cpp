@@ -178,36 +178,10 @@ BOOLEAN CConfiguration::ReadConfigurationFile()
 	if ( !str.CompareNoCase("TV") || !str.CompareNoCase("TEVII") )
 		conf_params.VendorSpecific = TV_BDA;
 
-	str = AfxGetApp()->GetProfileString("Dev_Bda2Driver DVBS", "S2_ROLLOFF", "NOT_SET");
-
-	DebugLog("BDA2: ReadConfigurationFile: S2_ROLLOFF = %s (default is NOT_SET)", str);
-	if(!str.CompareNoCase("20"))
-		conf_params.S2RollOff = ROLLOFF_20;
-	else
-	if(!str.CompareNoCase("25"))
-		conf_params.S2RollOff = ROLLOFF_25;
-	else
-	if(!str.CompareNoCase("35"))
-		conf_params.S2RollOff = ROLLOFF_35;
-	else
-		conf_params.S2RollOff = ROLLOFF_NOT_SET; // default
-
-	str = AfxGetApp()->GetProfileString("Dev_Bda2Driver DVBS", "S2_PILOT", "NOT_SET");
-
-	DebugLog("BDA2: ReadConfigurationFile: S2_PILOT = %s (default is NOT_SET)", str);
-	if(!str.CompareNoCase("ON"))
-		conf_params.S2Pilot = PILOT_ON;
-	else
-	if(!str.CompareNoCase("OFF"))
-		conf_params.S2Pilot = PILOT_OFF;
-	else
-		conf_params.S2Pilot = PILOT_NOT_SET; // default
 
 	conf_params.RelockTimeout = AfxGetApp()->GetProfileInt("Common","RelockTime",0);
 	if (conf_params.RelockTimeout > MAX_TIMEOUT) conf_params.RelockTimeout = MAX_TIMEOUT;
 	DebugLog("BDA2: ReadConfigurationFile: RelockTime = %i sec (default is 0, disabled)", conf_params.RelockTimeout);
-
-	conf_params.MIS = AfxGetApp()->GetProfileInt("Common","MIS",-1);
 
 	HANDLE hCfg;
 	hCfg = CreateFile(AfxGetApp()->m_pszProfileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
@@ -232,20 +206,6 @@ BOOLEAN CConfiguration::CreateConfigurationFile()
 		fputs("BDA_TYPE = NOT_SET\n\n",fp);
 		fprintf(fp,";Relock after timeout in sec (1-%d)\n",MAX_TIMEOUT);
 		fputs("RelockTime = 0\n\n",fp);
-		fputs("[Dev_Bda2Driver DVBS]\n\n",fp);
-		fputs(";S2 Roll Off\n",fp);
-		fputs(";   NOT_SET (default)\n",fp);
-		fputs(";   20 - 0.20\n",fp);
-		fputs(";   25 - 0.25\n",fp);
-		fputs(";   35 - 0.35\n",fp);
-		fputs("S2_ROLLOFF = NOT_SET\n\n",fp);
-		fputs(";S2 Pilot\n",fp);
-		fputs(";   NOT_SET (default)\n",fp);
-		fputs(";   ON\n",fp);
-		fputs(";   OFF\n",fp);
-		fputs("S2_PILOT = NOT_SET\n\n",fp);
-		fputs("[Dev_Bda2Driver DVBT]\n\n",fp);
-		fputs("[Dev_Bda2Driver DVBC]\n\n",fp);
 		fclose(fp);
 		return TRUE;
 	}
@@ -258,40 +218,8 @@ BOOLEAN CConfiguration::DoConfigurationDialog()
 	if (CfgDlg.DoModal()==IDOK)
 	{
 		char *ConfStr;
-		switch(conf_params.S2Pilot)
-		{
-		case PILOT_ON:
-			ConfStr="ON";
-			break;
-		case PILOT_OFF:
-			ConfStr="OFF";
-			break;
-		case PILOT_NOT_SET:
-		default:
-			ConfStr="NOT_SET";
-		}
-		AfxGetApp()->WriteProfileString("Dev_Bda2Driver DVBS", "S2_PILOT", ConfStr);
-
-		switch(conf_params.S2RollOff)
-		{
-		case ROLLOFF_20:
-			ConfStr="20";
-			break;
-		case ROLLOFF_25:
-			ConfStr="25";
-			break;
-		case ROLLOFF_35:
-			ConfStr="35";
-			break;
-		case ROLLOFF_NOT_SET:
-		default:
-			ConfStr="NOT_SET";
-		}
-		AfxGetApp()->WriteProfileString("Dev_Bda2Driver DVBS", "S2_ROLLOFF", ConfStr);
 
 		AfxGetApp()->WriteProfileInt("Common","RelockTime",conf_params.RelockTimeout);
-
-		AfxGetApp()->WriteProfileInt("Common","MIS",conf_params.MIS);
 	}
 	return TRUE;
 }

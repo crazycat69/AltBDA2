@@ -32,7 +32,5 @@ private:
 	STR_CB_PROC stream_callback;
 
 	CBdaGraph BdaGraph;
-
-	int GetMIS(int freq, int sr, int pol, int &pls_mode, int &pls_code);
 };
 

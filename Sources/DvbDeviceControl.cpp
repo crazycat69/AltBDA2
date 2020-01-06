@@ -134,38 +134,6 @@ int CDvbDeviceControl::StreamCallback(STR_CB_PROC d)
 	return AltxDVB_OK; // 0x0 OK, non zero quits AltDVB
 }
 
-int CDvbDeviceControl::GetMIS(int in_freq, int in_sr, int in_pol, int &pls_mode, int &pls_code)
-{
-	FILE *f=fopen("MIS.ini","rt");
-	int freq, sr, mis, pol, in_mis = conf_params.MIS;
-	char pol_ch;
-	if (!f) return in_mis;
-
-	char str[MAX_PATH];
-	while (fgets(str, MAX_PATH, f))
-	{
-		pls_mode = 0;
-		pls_code = 1;
-		if (sscanf(str,"%u,%c,%u,%u,%u,%u", &freq, &pol_ch, &sr, &mis, &pls_code, &pls_mode ) < 4) continue;
-		if (pol_ch == 'V' || pol_ch == 'v' || pol_ch == 'R' || pol_ch == 'r') pol=0;
-		else if (pol_ch == 'H' || pol_ch == 'h' || pol_ch == 'L' || pol_ch == 'l') pol=1;
-		else pol = -1;
-		if (in_freq == freq && in_sr == sr && in_pol == pol)
-		{
-			if (mis<0 || mis>255) continue;
-			in_mis = mis;
-			break;
-		}
-		else
-		{
-			pls_mode = 0;
-			pls_code = 1;
-		}
-	}
-	fclose(f);
-	return in_mis;
-}
-
 static Polarisation CurrPol = BDA_POLARISATION_NOT_SET;
 static clock_t lock_time=0; 
 static struct TUNE_DATA tune_data;
@@ -176,6 +144,9 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 	ModulationType ModType;
 	Polarisation Pol;
 	BinaryConvolutionCodeRate Fec;
+	Pilot S2Pilot;
+	RollOff S2RollOff;
+
 	LONG PosOpt=DEFAULT_POS_OPT;
 	BYTE DiSEqC_Port=0;
 	BOOL bUseTB=FALSE;
@@ -243,6 +214,7 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 			case INV_ON:	SpectrInv = BDA_SPECTRAL_INVERSION_INVERTED; break;
 			default: SpectrInv = BDA_SPECTRAL_INVERSION_NOT_DEFINED;
 		};
+
 		switch(d->polarity)
 		{
 			case LNB_POWER_OFF:		Pol = BDA_POLARISATION_NOT_DEFINED; break;
@@ -251,6 +223,7 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 			case LINEAR_VERTICAL:	Pol = BDA_POLARISATION_LINEAR_V; break;
 			default: Pol = BDA_POLARISATION_NOT_SET;
 		};
+
 		switch(d->fec)
 		{
 		case FEC_1_2:
@@ -274,15 +247,37 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 		default:
 			Fec = BDA_BCC_RATE_NOT_SET;
 		};
+
 		switch(d->modulation)
 		{
 			case MOD_AUTO:	ModType = BDA_MOD_NOT_DEFINED; break;
 			case MOD_QPSK:	ModType = BDA_MOD_QPSK; break;
 			case MOD_8PSK:	ModType = conf_params.ConfMod8PSK; break;
-			case MOD_QAM_16: ModType = BDA_MOD_16APSK; break;
-			case MOD_QAM_32: ModType = BDA_MOD_32APSK; break;
-			case MOD_VSB_8: ModType = BDA_MOD_NBC_QPSK; break;
-			default: ModType = BDA_MOD_QPSK;
+			case MOD_QPSK2:	ModType = BDA_MOD_NBC_QPSK; break;
+			case MOD_QAM_16: ModType = BDA_MOD_16QAM; break;
+			case MOD_QAM_32: ModType = BDA_MOD_32QAM; break;
+			case MOD_QAM_64: ModType = BDA_MOD_64QAM; break;
+			case MOD_QAM_128: ModType = BDA_MOD_128QAM; break;
+			case MOD_VSB_8: ModType = BDA_MOD_8VSB; break;
+			case MOD_VSB_16: ModType = BDA_MOD_16VSB; break;
+			case MOD_16APSK:	ModType = BDA_MOD_16APSK; break;
+			case MOD_32APSK:	ModType = BDA_MOD_32APSK; break;
+			default: ModType = BDA_MOD_NOT_SET;
+		};
+
+		switch(d->pilot)
+		{
+			case PILOT_OFF:	S2Pilot = BDA_PILOT_OFF; break;
+			case PILOT_ON:	S2Pilot = BDA_PILOT_ON; break;
+			default: S2Pilot = BDA_PILOT_NOT_SET;
+		};
+
+		switch(d->rolloff)
+		{
+			case ROLLOFF_20:	S2RollOff = BDA_ROLL_OFF_20; break;
+			case ROLLOFF_25:	S2RollOff = BDA_ROLL_OFF_25; break;
+			case ROLLOFF_35:	S2RollOff = BDA_ROLL_OFF_35; break;
+			default: S2RollOff = BDA_ROLL_OFF_NOT_SET;
 		};
 
 		switch(d->switches)
@@ -339,7 +334,15 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 			}
 
 		int pls_mode = 0, pls_code = 1;
-		int mis = GetMIS(d->frequency/1000,d->symbol_rate,d->polarity == LINEAR_HORIZONTAL ? 1 : 0, pls_mode, pls_code);
+
+		switch (d->pls_mode)
+		{
+		case PLS_ROOT:
+			pls_mode = 0; pls_code = d->pls_code; break;
+		case PLS_GOLD:
+			pls_mode = 1; pls_code = d->pls_code; break;
+		}
+		int isi = d->isi & 0x100 ? d->isi & 0xff : 0;
 		
 		switch(conf_params.VendorSpecific)
 		{
@@ -354,8 +357,8 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 					(LONG)(d->symbol_rate),
 					Pol,
 					Fec,
-					(Pilot)conf_params.S2Pilot,
-					(RollOff)conf_params.S2RollOff,
+					S2Pilot,
+					S2RollOff,
 					DiSEqC_Port,
 					bUseTB)))
 				return AltxDVB_ERR;
@@ -371,7 +374,7 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 					(LONG)(d->symbol_rate),
 					Pol,
 					Fec,
-					mis, pls_mode, pls_code)))
+					isi, pls_mode, pls_code)))
 				return AltxDVB_ERR;
 			break;
 		case CRAZY_BDA:
@@ -385,7 +388,7 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 					(LONG)(d->symbol_rate),
 					Pol,
 					Fec,
-					mis, pls_mode, pls_code)))
+					isi, pls_mode, pls_code)))
 				return AltxDVB_ERR;
 			break;
 		case HAUP_BDA:
@@ -399,8 +402,8 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 					(LONG)(d->symbol_rate),
 					Pol,
 					Fec,
-					conf_params.S2Pilot,
-					conf_params.S2RollOff,
+					S2Pilot,
+					S2RollOff,
 					PosOpt)))
 				return AltxDVB_ERR;
 			break;
@@ -415,8 +418,8 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 					(LONG)(d->symbol_rate),
 					Pol,
 					Fec,
-					conf_params.S2Pilot,
-					conf_params.S2RollOff,
+					S2Pilot,
+					S2RollOff,
 					PosOpt)))
 				return AltxDVB_ERR;
 			break;
@@ -438,7 +441,7 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 		case TBS_BDA:
 		case QBOX_BDA:
 		case TBS_NXP_BDA:
-			BdaGraph.DVBS_TBS_SetMIS(mis);
+			BdaGraph.DVBS_TBS_SetMIS(isi);
 			BdaGraph.DVBS_TBS_SetPLS(pls_mode, pls_code);
 		default:
 			{
