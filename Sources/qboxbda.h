@@ -149,6 +149,16 @@ typedef struct _MEDIAINFO
 	int		FrameLength;
 } MEDIAINFO;
 
+// DVB-T2 MultiPLP
+typedef struct _plp_info
+{
+    BYTE plpId; //The Rel PLPID need to set
+    BYTE plpCount; //PLP number 
+    BYTE plpResered1;//
+    BYTE plpResered2;//  memory size set to 4
+    BYTE plpIdList[256];//store the Rel PLPID
+} PLP_INFO;
+
 typedef struct _PLS_INFO
 { 
 	UINT PlsCode;

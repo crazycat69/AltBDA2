@@ -504,6 +504,48 @@ HRESULT CBdaGraph::DVBS_TBS_SetMIS(LONG mis)
 	return E_NOTIMPL;
 }
 
+HRESULT CBdaGraph::DVBS_TBS_SetPLP(LONG plp)
+{
+	HRESULT hr;
+	DWORD type_support = 0;
+
+	PLP_INFO cmd;
+	cmd.plpId = plp;
+
+	if (BdaType==QBOX_BDA)
+	{
+		CheckPointer(m_pKsTunerFilterPropSet,E_NOINTERFACE);
+
+		hr = m_pKsTunerFilterPropSet->QuerySupported(KSPROPERTYSET_QBOXControl,
+			KSPROPERTY_CTRL_PLPINFO, 
+			&type_support);
+
+		if (SUCCEEDED(hr) && (type_support&KSPROPERTY_SUPPORT_SET))
+		{
+			return m_pKsTunerFilterPropSet->Set(KSPROPERTYSET_QBOXControl,
+												KSPROPERTY_CTRL_PLPINFO,
+												NULL, 0,
+												&cmd, sizeof(cmd));
+		}
+	} else
+	{
+		CheckPointer(m_pKsTunerPropSet,E_NOINTERFACE);
+		hr = m_pKsTunerPropSet->QuerySupported(KSPROPSETID_BdaTunerExtensionProperties,
+			KSPROPERTY_BDA_PLPINFO, 
+			&type_support);
+		
+		if (SUCCEEDED(hr) && (type_support & KSPROPERTY_SUPPORT_SET))
+		{
+			// make call into driver
+			return m_pKsTunerPropSet->Set(KSPROPSETID_BdaTunerExtensionProperties,
+				KSPROPERTY_BDA_PLPINFO,
+				&cmd, sizeof(cmd),
+				&cmd, sizeof(cmd));
+		}
+	}
+	return E_NOTIMPL;
+}
+
 HRESULT CBdaGraph::DVBS_TBS_SetPLS( UINT PLSMode, DWORD PLSCode )
 {
 	HRESULT hr;

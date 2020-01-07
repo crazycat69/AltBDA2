@@ -186,6 +186,9 @@ public:
 	HRESULT DVBT_Tune(
 		ULONG Frequency,
 		ULONG Bandwidth);
+	HRESULT DVBT_MS_Tune(
+		ULONG Frequency,
+		ULONG Bandwidth, ULONG Plp);
 	HRESULT DVBC_Tune(
 		ULONG Frequency,
 		LONG SymRate,
@@ -217,6 +220,7 @@ public:
 	HRESULT DVBS_TBS_LNBPower (BOOL bPower);
 	HRESULT DVBS_TBS_SetPol(Polarisation ePol);
 	HRESULT DVBS_TBS_SetMIS(LONG mis);
+	HRESULT DVBS_TBS_SetPLP(LONG plp);
 	HRESULT DVBS_TBS_SetPLS( UINT PLSMode, DWORD PLSCode );
 
 	HRESULT DVBS_TBS_NXP_DiSEqC(BYTE len, BYTE *DiSEqC_Command);

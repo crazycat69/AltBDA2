@@ -142,7 +142,7 @@ void CConfiguration::ConfCaps()
 	default:
 		conf_params.ConfMod8PSK = BDA_MOD_8PSK;
 		conf_params.ConfDiSEqC = DISEQC_COMMITED;
-		ReportMessage("Generic BDA used + DiseqC 1.0 (via InputRange)!");
+		ReportMessage("Generic BDA used !");
 	}
 }
 

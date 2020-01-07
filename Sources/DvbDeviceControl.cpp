@@ -445,7 +445,6 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 			BdaGraph.DVBS_TBS_SetPLS(pls_mode, pls_code);
 		default:
 			{
-				int rc = FALSE;
 				return SUCCEEDED(BdaGraph.DVBS_Tune(
 					(ULONG)(d->lnb_low),
 					(ULONG)(d->lnb_high),
@@ -462,10 +461,32 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 		break;
 		}
 	case DVBT:
-		if(FAILED(BdaGraph.DVBT_Tune(
-				(ULONG)(d->frequency),
-				(ULONG)(d->bandwidth))))
-			return AltxDVB_ERR;
+		switch(conf_params.VendorSpecific)
+		{
+		case MS_BDA:
+			{
+				int plp = d->isi & 0x100 ? d->isi & 0xff : -1;
+				if(FAILED(BdaGraph.DVBT_MS_Tune(
+						(ULONG)(d->frequency),
+						(ULONG)(d->bandwidth),(ULONG)(plp))))
+					return AltxDVB_ERR;
+			}
+			break;
+		case TBS_BDA:
+		case QBOX_BDA:
+		case TBS_NXP_BDA:
+			{
+				int plp = d->isi & 0x100 ? d->isi & 0xff : 0;
+				BdaGraph.DVBS_TBS_SetPLP(plp);
+			}
+		default:
+			{
+				if(FAILED(BdaGraph.DVBT_Tune(
+						(ULONG)(d->frequency),
+						(ULONG)(d->bandwidth))))
+					return AltxDVB_ERR;
+			}
+		}
 		break;
 	case DVBC:
 		switch(d->modulation)

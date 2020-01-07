@@ -1093,7 +1093,10 @@ HRESULT CBdaGraph::BuildGraph(int selected_device_enum, enum VENDOR_SPECIFIC *Ve
 		}
 	}
 
-	if (m_pKsTunerPropSet)
+	GUID type;
+	hr = GetNetworkTunerType(m_pTunerDevice, &type);
+
+	if(IsEqualGUID(type, CLSID_DVBSNetworkProvider))
 	{
 		DWORD supported=0;
 		// Microsoft
@@ -1111,6 +1114,20 @@ HRESULT CBdaGraph::BuildGraph(int selected_device_enum, enum VENDOR_SPECIFIC *Ve
 				*VendorSpecific = VENDOR_SPECIFIC(MS_BDA);
 			}
 		}
+	}
+	else
+	{
+		DWORD supported=0;
+		DebugLog("BDA2: BuildGraph: checking for Microsoft PLP interface");
+		hr = m_pKsDemodPropSet->QuerySupported(KSPROPSETID_BdaDigitalDemodulator,
+				KSPROPERTY_BDA_PLP_NUMBER, &supported);
+		if(SUCCEEDED(hr) && (supported & KSPROPERTY_SUPPORT_SET))
+		{
+			DebugLog("BDA2: BuildGraph: found Microsoft PLP interface");
+			*VendorSpecific = VENDOR_SPECIFIC(MS_BDA);
+		}
+		else
+			*VendorSpecific = VENDOR_SPECIFIC(PURE_BDA);
 	}
 
 	hr = m_pFilterGraph->QueryInterface(IID_IMediaControl, (void **)&m_pMediaControl);
@@ -1679,6 +1696,37 @@ HRESULT CBdaGraph::DVBT_Tune(
 			ULONG Frequency,
 			ULONG Bandwidth)
 {
+	if(pNetworkProviderInstance)
+		return pNetworkProviderInstance->DoDVBTTuning(Frequency, Bandwidth);
+	else
+		return E_FAIL;
+}
+
+HRESULT CBdaGraph::DVBT_MS_Tune(
+			ULONG Frequency,
+			ULONG Bandwidth, ULONG Plp)
+{
+	char text[256];
+	HRESULT hr;
+
+	KSPROPERTY instance_data;
+	DWORD supported;
+	// PLP
+	hr = m_pKsDemodPropSet->QuerySupported(KSPROPSETID_BdaDigitalDemodulator,
+		KSPROPERTY_BDA_PLP_NUMBER, &supported);
+	if ( SUCCEEDED(hr) && ( supported & KSPROPERTY_SUPPORT_SET) )
+	{
+		// set PLP
+		hr = m_pKsDemodPropSet->Set(KSPROPSETID_BdaDigitalDemodulator,
+			KSPROPERTY_BDA_PLP_NUMBER,
+			&instance_data, sizeof(instance_data), &Plp, sizeof(Plp));
+		if FAILED(hr)
+			sprintf(text,"BDA2: DVBT_Tune: failed setting PLP to %d (hr=0x%8.8x)", Plp, hr);
+		else
+			sprintf(text,"BDA2: DVBT_Tune: set PLP to %d", Plp);
+		ReportMessage(text);
+	}
+
 	if(pNetworkProviderInstance)
 		return pNetworkProviderInstance->DoDVBTTuning(Frequency, Bandwidth);
 	else
