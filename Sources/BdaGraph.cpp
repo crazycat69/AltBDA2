@@ -10,6 +10,7 @@
 #include "gnpbda.h"
 #include "netup_bda_api.h"
 #include "CrazyBDA.h"
+#include "amtbda.h"
 
 CBdaGraph::CBdaGraph()
 {
@@ -801,7 +802,7 @@ HRESULT CBdaGraph::BuildGraph(int selected_device_enum, enum VENDOR_SPECIFIC *Ve
 	hr = m_pTunerDevice->QueryInterface(IID_IKsPropertySet, (void **)&m_pKsTunerFilterPropSet);
 	if (hr==S_OK)
 	{
-		DWORD supported;		
+		DWORD supported;
 		// Turbosight QBOX
 		hr = m_pKsTunerFilterPropSet->QuerySupported(KSPROPERTYSET_QBOXControl,
 			KSPROPERTY_CTRL_MOTOR, &supported);
@@ -826,6 +827,28 @@ HRESULT CBdaGraph::BuildGraph(int selected_device_enum, enum VENDOR_SPECIFIC *Ve
 			DebugLog("BDA2: BuildGraph: found CrazyUnified DiSEqC interface");
 			*VendorSpecific = VENDOR_SPECIFIC(CRAZY_BDA);
 		}
+		// Astrometa
+		hr = m_pKsTunerFilterPropSet->QuerySupported(KSPROPSETID_AMDVB_Ter,
+			KSPROPERTY_AMDVB_PLPINFO, &supported);
+		if ( SUCCEEDED(hr) && (supported & KSPROPERTY_SUPPORT_SET) )
+		{
+			DWORD mode=6;
+			DebugLog("BDA2: BuildGraph: found Astrometa PLP interface");
+			*VendorSpecific = VENDOR_SPECIFIC(AMT_BDA);
+			ULONG bytesReturned = 0;
+			hr = m_pKsTunerFilterPropSet->Get(KSPROPSETID_AMDVB_Ter,
+				KSPROPERTY_AMDVB_DELSYS,
+				NULL, 0,
+				&mode, sizeof(mode),
+				&bytesReturned);
+			Sleep(500);
+			if (mode == 6)
+				hr = m_pKsTunerFilterPropSet->Get(KSPROPSETID_AMDVB_Ter,
+					KSPROPERTY_AMDVB_TERMODE,
+					NULL, 0,
+					&mode, sizeof(mode),
+					&bytesReturned);
+			}
 	}
 
 	BdaType = *VendorSpecific;
@@ -1121,13 +1144,16 @@ HRESULT CBdaGraph::BuildGraph(int selected_device_enum, enum VENDOR_SPECIFIC *Ve
 		DebugLog("BDA2: BuildGraph: checking for Microsoft PLP interface");
 		hr = m_pKsDemodPropSet->QuerySupported(KSPROPSETID_BdaDigitalDemodulator,
 				KSPROPERTY_BDA_PLP_NUMBER, &supported);
-		if(SUCCEEDED(hr) && (supported & KSPROPERTY_SUPPORT_SET))
+		if ( (*VendorSpecific == VENDOR_SPECIFIC(PURE_BDA)) || (PrefBDA == VENDOR_SPECIFIC(MS_BDA)) )
 		{
-			DebugLog("BDA2: BuildGraph: found Microsoft PLP interface");
-			*VendorSpecific = VENDOR_SPECIFIC(MS_BDA);
+			if(SUCCEEDED(hr) && (supported & KSPROPERTY_SUPPORT_SET))
+			{
+				DebugLog("BDA2: BuildGraph: found Microsoft PLP interface");
+				*VendorSpecific = VENDOR_SPECIFIC(MS_BDA);
+			}
+			else
+				*VendorSpecific = VENDOR_SPECIFIC(PURE_BDA);
 		}
-		else
-			*VendorSpecific = VENDOR_SPECIFIC(PURE_BDA);
 	}
 
 	hr = m_pFilterGraph->QueryInterface(IID_IMediaControl, (void **)&m_pMediaControl);
@@ -1704,7 +1730,7 @@ HRESULT CBdaGraph::DVBT_Tune(
 
 HRESULT CBdaGraph::DVBT_MS_Tune(
 			ULONG Frequency,
-			ULONG Bandwidth, ULONG Plp)
+			ULONG Bandwidth, LONG Plp)
 {
 	char text[256];
 	HRESULT hr;
@@ -1726,6 +1752,38 @@ HRESULT CBdaGraph::DVBT_MS_Tune(
 			sprintf(text,"BDA2: DVBT_Tune: set PLP to %d", Plp);
 		ReportMessage(text);
 	}
+
+	if(pNetworkProviderInstance)
+		return pNetworkProviderInstance->DoDVBTTuning(Frequency, Bandwidth);
+	else
+		return E_FAIL;
+}
+
+HRESULT CBdaGraph::DVBT_Astrometa_Tune(
+			ULONG Frequency,
+			ULONG Bandwidth,
+			int Mode,
+			LONG Plp)
+{
+	char text[256];
+	HRESULT hr;
+
+	switch(Mode)
+	{
+		case DELSYS_DVBCA:
+		case DELSYS_DVBCB:
+		case DELSYS_DVBCC:
+			Mode = RM_DVB_C; break;
+		case DELSYS_DVBT:
+			Mode = RM_DVB_T; break;
+		case DELSYS_DVBT2:
+		default:
+			Mode = RM_DVB_T2;
+	}
+
+	DVBT_Astrometa_SetMode(Mode);
+
+	DVBT_Astrometa_SetPLP(Plp);
 
 	if(pNetworkProviderInstance)
 		return pNetworkProviderInstance->DoDVBTTuning(Frequency, Bandwidth);

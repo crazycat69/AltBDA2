@@ -74,6 +74,9 @@ BOOL ConfDialog::OnInitDialog()
 	case MS_BDA:
 		m_strBDAExt = "Microsoft BDA";
 		break;
+	case AMT_BDA:
+		m_strBDAExt = "Astrometa BDA";
+		break;
 	case PURE_BDA:
 	default:
 		m_strBDAExt = "Generic BDA";

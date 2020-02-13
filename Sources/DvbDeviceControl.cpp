@@ -472,6 +472,15 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 					return AltxDVB_ERR;
 			}
 			break;
+		case AMT_BDA:
+			{
+				int plp = d->isi & 0x100 ? d->isi & 0xff : 0;
+				if(FAILED(BdaGraph.DVBT_Astrometa_Tune(
+						(ULONG)(d->frequency),
+						(ULONG)(d->bandwidth), d->delsys, (ULONG)(plp))))
+					return AltxDVB_ERR;
+			}
+			break;
 		case TBS_BDA:
 		case QBOX_BDA:
 		case TBS_NXP_BDA:

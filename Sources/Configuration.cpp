@@ -138,6 +138,11 @@ void CConfiguration::ConfCaps()
 		conf_params.ConfDiSEqC = DISEQC_TONEBURST | DISEQC_COMMITED | DISEQC_RAW;
 		ReportMessage("Microsoft BDA extension used !");
 		break;
+	case AMT_BDA:
+		conf_params.ConfMod8PSK = BDA_MOD_8PSK;
+		conf_params.ConfDiSEqC = 0;
+		ReportMessage("Astrometa BDA extension used !");
+		break;
 	case PURE_BDA:
 	default:
 		conf_params.ConfMod8PSK = BDA_MOD_8PSK;

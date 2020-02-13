@@ -29,7 +29,8 @@ enum VENDOR_SPECIFIC { PURE_BDA,
 					   GNP_BDA,
 					   GENPIX_BDA,
 					   NETUP_BDA,
-					   CRAZY_BDA};
+					   CRAZY_BDA,
+					   AMT_BDA};
 
 enum LEVELS_TYPE { LEVELS_BDA, LEVELS_TT, LEVELS_STB };
 

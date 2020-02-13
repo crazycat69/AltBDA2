@@ -188,7 +188,10 @@ public:
 		ULONG Bandwidth);
 	HRESULT DVBT_MS_Tune(
 		ULONG Frequency,
-		ULONG Bandwidth, ULONG Plp);
+		ULONG Bandwidth, LONG Plp);
+	HRESULT DVBT_Astrometa_Tune(
+		ULONG Frequency,
+		ULONG Bandwidth, int Mode, LONG Plp);
 	HRESULT DVBC_Tune(
 		ULONG Frequency,
 		LONG SymRate,
@@ -285,6 +288,9 @@ public:
 	HRESULT DVBS_Crazy_DiSEqC(BYTE len, BYTE *DiSEqC_Command);
 	HRESULT DVBS_Crazy_ToneBurst(BOOL bToneBurst);
 	HRESULT DVBS_Crazy_LNBPower(BOOL bPower);
+
+	HRESULT DVBT_Astrometa_SetPLP(LONG Plp);
+	HRESULT DVBT_Astrometa_SetMode(DWORD Mode);
 
 	void SetStreamCallbackProcedure(STR_CB_PROC);
 

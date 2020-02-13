@@ -1,6 +1,6 @@
 #ifndef DLL_H
 #define DLL_H
-/* AltDVB v2.2 device interface, by Diodato */
+/* AltDVB v2.3 device interface, by Diodato */
 /* PASCAL calling convention */
 /* int is 4B, short is 2B, char is 1B, enum is 4B */
 
@@ -107,6 +107,20 @@ enum PILOT { PILOT_AUTO=0, PILOT_OFF, PILOT_ON };
 enum ROLLOFF { ROLLOFF_AUTO=0, ROLLOFF_05, ROLLOFF_10, ROLLOFF_15, ROLLOFF_20, ROLLOFF_25, ROLLOFF_35 };
 
 enum PLS_MODE { PLS_NONE=0, PLS_ROOT, PLS_GOLD };
+
+enum DELSYS { DELSYS_NONE = 0,
+			  DELSYS_DVBS = 0x10,
+			  DELSYS_DVBS2 = 0x11,
+			  DELSYS_DVBCA = 0x20,
+			  DELSYS_DVBCB = 0x21,
+			  DELSYS_DVBCC = 0x22,
+			  DELSYS_DVBC2 = 0x23,
+			  DELSYS_DVBT = 0x30,
+			  DELSYS_DVBT2 = 0x31,
+			  DELSYS_ATSC = 0x40,
+			  DELSYS_ATSCMH = 0x41,
+			  DELSYS_DVBH = 0x50,
+			  DELSYS_DAB = 0x51};
 
 struct TUNE_DATA
 {
