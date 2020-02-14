@@ -765,11 +765,6 @@ HRESULT CBdaGraph::BuildGraph(int selected_device_enum, enum VENDOR_SPECIFIC *Ve
 			DebugLog("BDA2: BuildGraph: found Turbosight-NXP DiSEqC interface");
 			*VendorSpecific = VENDOR_SPECIFIC(TBS_NXP_BDA);
 		}
-		if ( SUCCEEDED(hr) && (supported & KSPROPERTY_SUPPORT_SET) && (!(supported & KSPROPERTY_SUPPORT_GET)) )
-		{
-			DebugLog("BDA2: BuildGraph: found Turbosight-NXP DiSEqC interface");
-			*VendorSpecific = VENDOR_SPECIFIC(TBS_NXP_BDA);
-		}
 		// Twinhan
 		if (THBDA_IOCTL_CHECK_INTERFACE_Fun())
 		{
@@ -851,7 +846,6 @@ HRESULT CBdaGraph::BuildGraph(int selected_device_enum, enum VENDOR_SPECIFIC *Ve
 			}
 	}
 
-	BdaType = *VendorSpecific;
 	hr = S_OK;
 #ifdef SG_USE
 	pCallbackInstance = new CSampleGrabberCB();
@@ -1141,6 +1135,26 @@ HRESULT CBdaGraph::BuildGraph(int selected_device_enum, enum VENDOR_SPECIFIC *Ve
 	else
 	{
 		DWORD supported=0;
+
+		DebugLog("BDA2: BuildGraph: checking for TBS PLP interface");
+		hr = m_pKsTunerPropSet->QuerySupported(KSPROPSETID_BdaTunerExtensionProperties,
+			KSPROPERTY_BDA_PLPINFO, &supported);
+		if ( (*VendorSpecific == VENDOR_SPECIFIC(PURE_BDA)) || (PrefBDA == VENDOR_SPECIFIC(TBS_BDA)) )
+			if ( SUCCEEDED(hr) && (supported & KSPROPERTY_SUPPORT_SET) )
+			{
+				DebugLog("BDA2: BuildGraph: found Turbosight PLP interface");
+				*VendorSpecific = VENDOR_SPECIFIC(TBS_BDA);
+			}
+
+		DebugLog("BDA2: BuildGraph: checking for TBS QBOX PLP interface");
+		hr = m_pKsTunerFilterPropSet->QuerySupported(KSPROPERTYSET_QBOXControl,
+			KSPROPERTY_CTRL_PLPINFO, &supported);
+		if ( SUCCEEDED(hr) && (supported & KSPROPERTY_SUPPORT_SET))
+		{
+			DebugLog("BDA2: BuildGraph: found Turbosight-QBOX PLP interface");
+			*VendorSpecific = VENDOR_SPECIFIC(QBOX_BDA);
+		}
+
 		DebugLog("BDA2: BuildGraph: checking for Microsoft PLP interface");
 		hr = m_pKsDemodPropSet->QuerySupported(KSPROPSETID_BdaDigitalDemodulator,
 				KSPROPERTY_BDA_PLP_NUMBER, &supported);
@@ -1156,6 +1170,7 @@ HRESULT CBdaGraph::BuildGraph(int selected_device_enum, enum VENDOR_SPECIFIC *Ve
 		}
 	}
 
+	BdaType = *VendorSpecific;
 	hr = m_pFilterGraph->QueryInterface(IID_IMediaControl, (void **)&m_pMediaControl);
 	if(FAILED(hr))
 	{
