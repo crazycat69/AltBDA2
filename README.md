@@ -4,6 +4,9 @@ The configuration file (Dev_Bda2Driver.cfg) should be placed in the same folder
 as the interface (Dev_Bda2Driver.int). If this file doesn't exist, the interface driver
 will create a new one with default values.
 
+v 0.2.3.3 - 2020.02.14 - CrazyCat
+- DVB-T2 PLP setting support for TBS and Astrometa.
+
 v 0.2.3.2 - 2020.01.07 - CrazyCat
 - Fix version string.
 - PLP setting support for DVB-T2.
