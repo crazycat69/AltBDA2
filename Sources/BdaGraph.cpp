@@ -831,7 +831,7 @@ HRESULT CBdaGraph::BuildGraph(int selected_device_enum, enum VENDOR_SPECIFIC *Ve
 			DebugLog("BDA2: BuildGraph: found Astrometa PLP interface");
 			*VendorSpecific = VENDOR_SPECIFIC(AMT_BDA);
 			ULONG bytesReturned = 0;
-			hr = m_pKsTunerFilterPropSet->Get(KSPROPSETID_AMDVB_Ter,
+			hr = m_pKsTunerFilterPropSet->Get(KSPROPSETID_AMDVB_Ctl,
 				KSPROPERTY_AMDVB_DELSYS,
 				NULL, 0,
 				&mode, sizeof(mode),
