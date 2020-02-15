@@ -48,7 +48,7 @@ HRESULT CBdaGraph::DVBT_Astrometa_SetMode(DWORD Mode)
 	HRESULT hr=S_OK;
 	DWORD supported;
 
-	hr = m_pKsTunerFilterPropSet->QuerySupported(KSPROPSETID_AMDVB_Ter,
+	hr = m_pKsTunerFilterPropSet->QuerySupported(KSPROPSETID_AMDVB_Ctl,
 		KSPROPERTY_AMDVB_DELSYS, &supported);
 
 	DWORD submode = Mode == RM_FMDAB ? 0 : 6;
@@ -56,7 +56,7 @@ HRESULT CBdaGraph::DVBT_Astrometa_SetMode(DWORD Mode)
 	if ( SUCCEEDED(hr) && ( supported & KSPROPERTY_SUPPORT_SET) )
 	{
 		DWORD mode = 0;
-		hr = m_pKsTunerFilterPropSet->Set(KSPROPSETID_AMDVB_Ter,
+		hr = m_pKsTunerFilterPropSet->Set(KSPROPSETID_AMDVB_Ctl,
 			KSPROPERTY_AMDVB_DELSYS,
 			NULL, 0,
 			&submode, sizeof(submode));
