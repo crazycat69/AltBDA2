@@ -22,7 +22,7 @@ BEGIN
         BEGIN
             VALUE "ProductName", "BDA DVB-S/T/C Driver Wrapper for AltDVB"
             VALUE "ProductVersion", VERSION_STRING
-            VALUE "LegalCopyright", "(C) 2008 Diodato, 2010-20 CrazyCat"
+            VALUE "LegalCopyright", "(C) 2008 Diodato, 2010-21 CrazyCat"
             VALUE "CompanyName", "CrazyCat Labs"
             VALUE "FileDescription", "BDA DVB-S/T/C Driver Wrapper for AltDVB"
             VALUE "FileVersion", VERSION_STRING

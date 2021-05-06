@@ -843,7 +843,7 @@ HRESULT CBdaGraph::BuildGraph(int selected_device_enum, enum VENDOR_SPECIFIC *Ve
 					NULL, 0,
 					&mode, sizeof(mode),
 					&bytesReturned);
-			}
+		}
 	}
 
 	hr = S_OK;
@@ -1798,10 +1798,12 @@ HRESULT CBdaGraph::DVBT_Astrometa_Tune(
 
 	DVBT_Astrometa_SetMode(Mode);
 
-	DVBT_Astrometa_SetPLP(Plp);
-
 	if(pNetworkProviderInstance)
-		return pNetworkProviderInstance->DoDVBTTuning(Frequency, Bandwidth);
+	{
+		hr = pNetworkProviderInstance->DoDVBTTuning(Frequency, Bandwidth);
+		hr = DVBT_Astrometa_SetPLP(Plp);
+		return hr;
+	}
 	else
 		return E_FAIL;
 }

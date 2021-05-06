@@ -46,13 +46,13 @@ enum DEVICE_TYPE { DVBS=0x1, DVBC=0x2, DVBT=0x3, ATSC=0x4, ERR=0x9, AVAILABLE=0x
 
 struct DEVICE_DATA // length 0x824 == 2084B
 {
-	int dev_cnt; // up to 8 devices
+	int dev_cnt; // up to 64 devices
 	struct
 	{
 		DWORD dev_type;
 		char dev_name[128];
 		char dev_id[128];
-	} device[8];
+	} device[64];
 };
 
 #define MESSAGE_CALLBACK_ID1 0x20000001 // they don't show-up inthe initial popup
