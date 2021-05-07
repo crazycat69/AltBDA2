@@ -1,7 +1,7 @@
 #define VERSION_MAJOR	0
 #define VERSION_MINOR	2
 #define VERSION_PATCH	4
-#define VERSION_REV	4
+#define VERSION_REV	5
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
