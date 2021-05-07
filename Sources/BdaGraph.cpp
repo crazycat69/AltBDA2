@@ -63,7 +63,7 @@ HRESULT CBdaGraph::GetNetworkTuners(struct NetworkTuners *Tuners)
 		ULONG cFetched;
 		int dev_enum_i = 0;
 
-		while(pEnumCat->Next(1, &pMoniker, &cFetched) == S_OK && Tuners->Count < 64)
+		while(pEnumCat->Next(1, &pMoniker, &cFetched) == S_OK && Tuners->Count < MAX_DEVICES)
 		{
 			IPropertyBag *pPropBag;
 			hr = pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void **)&pPropBag);

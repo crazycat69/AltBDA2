@@ -66,7 +66,7 @@ struct NetworkTuners
 		char Name[128];
 		int Id;
 		BOOLEAN Availability;
-	} Tuner[8];
+	} Tuner[MAX_DEVICES];
 };
 
 class CBdaGraph
