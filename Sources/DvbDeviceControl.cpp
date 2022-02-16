@@ -221,6 +221,8 @@ int CDvbDeviceControl::Tune(struct TUNE_DATA *d)
 			case LNB_POWER_ON:		Pol = BDA_POLARISATION_LINEAR_V; break;
 			case LINEAR_HORIZONTAL:	Pol = BDA_POLARISATION_LINEAR_H; break;
 			case LINEAR_VERTICAL:	Pol = BDA_POLARISATION_LINEAR_V; break;
+			case CIRCULAR_RIGHT:	Pol = BDA_POLARISATION_CIRCULAR_R; break;
+			case CIRCULAR_LEFT:		Pol = BDA_POLARISATION_CIRCULAR_L; break;
 			default: Pol = BDA_POLARISATION_NOT_SET;
 		};
 
